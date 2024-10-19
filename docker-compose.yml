@@ -22,26 +22,26 @@ x-n8n: &service-n8n
   links:
     - postgres
 
-x-ollama: &service-ollama
-  image: ollama/ollama:latest
-  container_name: ollama
-  networks: ['demo']
-  restart: unless-stopped
-  ports:
-    - 11434:11434
-  volumes:
-    - ollama_storage:/root/.ollama
+# x-ollama: &service-ollama
+#   image: ollama/ollama:latest
+#   container_name: ollama
+#   networks: ['demo']
+#   restart: unless-stopped
+#   ports:
+#     - 11434:11434
+#   volumes:
+#     - ollama_storage:/root/.ollama
 
-x-init-ollama: &init-ollama
-  image: ollama/ollama:latest
-  networks: ['demo']
-  container_name: ollama-pull-llama
-  volumes:
-    - ollama_storage:/root/.ollama
-  entrypoint: /bin/sh
-  command:
-    - "-c"
-    - "sleep 3; OLLAMA_HOST=ollama:11434 ollama pull llama3.2"
+# x-init-ollama: &init-ollama
+#   image: ollama/ollama:latest
+#   networks: ['demo']
+#   container_name: ollama-pull-llama
+#   volumes:
+#     - ollama_storage:/root/.ollama
+#   entrypoint: /bin/sh
+#   command:
+#     - "-c"
+#     - "sleep 3; OLLAMA_HOST=ollama:11434 ollama pull llama3.2"
 
 services:
   postgres:
@@ -52,6 +52,7 @@ services:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
+      - POSTGRES_SSLMODE=require
     volumes:
       - postgres_storage:/var/lib/postgresql/data
     healthcheck:
@@ -78,7 +79,7 @@ services:
     container_name: n8n
     restart: unless-stopped
     ports:
-      - 5678:5678
+      - 443:5678
     volumes:
       - n8n_storage:/home/node/.n8n
       - ./n8n/backup:/backup
@@ -99,29 +100,29 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
 
-  ollama-cpu:
-    profiles: ["cpu"]
-    <<: *service-ollama
+  # ollama-cpu:
+  #   profiles: ["cpu"]
+  #   <<: *service-ollama
 
-  ollama-gpu:
-    profiles: ["gpu-nvidia"]
-    <<: *service-ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+  # ollama-gpu:
+  #   profiles: ["gpu-nvidia"]
+  #   <<: *service-ollama
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
 
-  ollama-pull-llama-cpu:
-    profiles: ["cpu"]
-    <<: *init-ollama
-    depends_on:
-      - ollama-cpu
+  # ollama-pull-llama-cpu:
+  #   profiles: ["cpu"]
+  #   <<: *init-ollama
+  #   depends_on:
+  #     - ollama-cpu
 
-  ollama-pull-llama-gpu:
-    profiles: ["gpu-nvidia"]
-    <<: *init-ollama
-    depends_on:
-      - ollama-gpu
+  # ollama-pull-llama-gpu:
+  #   profiles: ["gpu-nvidia"]
+  #   <<: *init-ollama
+  #   depends_on:
+  #     - ollama-gpu
