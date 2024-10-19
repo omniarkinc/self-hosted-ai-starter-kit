@@ -52,7 +52,7 @@ services:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
-      - POSTGRES_SSLMODE=require
+      # - POSTGRES_SSLMODE=require
     volumes:
       - postgres_storage:/var/lib/postgresql/data
     healthcheck:
