@@ -58,6 +58,7 @@ services:
   caddy:
     image: caddy:latest
     restart: unless-stopped
+    networks: ['demo']
     ports:
       - "80:80"
       - "443:443"
@@ -101,6 +102,7 @@ services:
     <<: *service-n8n
     container_name: n8n
     restart: unless-stopped
+    networks: ['demo']
     ports:
       - 5678:5678
     volumes:
